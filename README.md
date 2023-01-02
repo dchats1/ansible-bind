@@ -1,7 +1,7 @@
-Role Name
+Ansible Bind
 =========
 
-A brief description of the role goes here.
+Deploy Bind9 on Fedora Server
 
 Requirements
 ------------

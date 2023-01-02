@@ -1,2 +1,54 @@
 ---
-# tasks file for ansible-bind
+- name: Install latest version of Bind9
+  ansible.builtin.dnf:
+    name: bind-{{ bind_version }}
+    state: present
+
+- name: Install latest version of firewalld
+  ansible.builtin.dnf:
+    name: firewalld
+    state: present
+
+- name: Allow DNS service through firewall
+  ansible.posix.firewalld:
+    service: dns
+    permanent: yes
+    state: enabled
+
+- name: Generate rndc.key
+  ansible.builtin.command: /usr/sbin/rndc-confgen -a
+  args:
+    creates: /etc/rndc.key
+
+- name: Set /etc/rndc.conf
+  ansible.builtin.template:
+    src: rndc.conf.j2
+    dest: /etc/rndc.conf
+    owner: named
+    group: named
+    mode: '0600'
+
+- name: Set named_write_master_zones flag on and keep it persistent across reboots
+  ansible.posix.seboolean:
+    name: named_write_master_zones
+    state: yes
+    persistent: yes
+
+- name: Correct permissions for rndc.key
+  ansible.builtin.file:
+    path: /etc/rndc.key
+    owner: named
+    group: named
+    mode: '0600'
+
+- name: Set /etc/named.conf
+  ansible.builtin.template:
+    src: named.conf.j2
+    dest: /etc/named.conf
+    owner: root
+    group: named
+    mode: '0640'
+    validate: named-checkconf %s
+  notify:
+    - restart named
+  
