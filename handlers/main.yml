@@ -4,3 +4,8 @@
     name: named
     state: restarted
     enabled: yes
+
+- name: reload named
+  ansible.builtin.systemd:
+    name: named
+    state: reloaded
