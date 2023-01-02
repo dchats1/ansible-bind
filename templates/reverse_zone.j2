@@ -1,0 +1,16 @@
+; reverse map zone file for {{ address }}
+$TTL {{ ttl }}
+$ORIGIN {{ reverse }}.
+@     IN      SOA   {{ soa }} (
+                                        2003080800 ; serial number
+                                        3h         ; refresh
+                                        15m        ; update retry
+                                        3w         ; expiry
+                                        3h         ; nx = nxdomain ttl
+                                        )
+      IN      NS      {{ ns_server }}.
+
+; PTR Records
+{% for key, value in ptr_records.items() %}
+{{ value }}     IN      PTR     {{ value }}.
+{% endfor %}

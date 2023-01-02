@@ -51,4 +51,40 @@
     validate: named-checkconf %s
   notify:
     - restart named
-  
+
+- name: Create forward zone files
+  vars:
+    domain: "{{ item.domain }}"
+    ttl: "{{ item.ttl }}"
+    ns_servers: "{{ item.ns_servers }}"
+    a_records: "{{ item.a_records }}"
+  ansible.builtin.template:
+    src: forward_zone.j2
+    dest: "/var/named/{{ domain }}"
+    owner: root
+    group: named
+    mode: '0640'
+  loop: "{{ bind_forward_zones }}"
+
+- name: Create reverse zone files
+  vars:
+    name: "{{ item.name }}"
+    address: "{{ item.address }}"
+    reverse: "{{ item.reverse }}"
+    ttl: "{{ item.ttl }}"
+    ns_server: "{{ item.ns_server }}"
+    soa: "{{ item.soa }}"
+    ptr_records: "{{ item.ptr_records }}"
+  ansible.builtin.template:
+    src: reverse_zone.j2
+    dest: "/var/named/{{ name }}.rev"
+    owner: root
+    group: named
+    mode: '0640'
+  loop: "{{ bind_reverse_zones }}"
+
+- name: Start and Enable named
+  ansible.builtin.systemd:
+    name: named
+    state: started
+    enabled: yes

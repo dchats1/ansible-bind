@@ -1,2 +1,5 @@
 ---
 bind_version: 9.18.8
+bind_allow_query: any
+bind_forward_zones: {}
+bind_reverse_zones: {}

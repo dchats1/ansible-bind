@@ -1,0 +1,21 @@
+; base zone file for {{ domain }}
+$TTL {{ ttl }}    ; default TTL for zone
+$ORIGIN {{ domain }}. ; base domain-name
+; Start of Authority RR defining the key characteristics of the zone (domain)
+@         IN      SOA   ns1.{{ domain }}. hostmaster.{{ domain }}. (
+                                2003080800 ; serial number
+                                12h        ; refresh
+                                15m        ; update retry
+                                3w         ; expiry
+                                2h         ; minimum
+                                )
+
+; Name Servers
+{% for server in ns_servers %}
+           IN      NS      {{ server }}.
+{% endfor %}
+
+; A Records
+{% for key, value in a_records.items() %}
+{{ key }}  IN  A  {{ value }}
+{% endfor %}
